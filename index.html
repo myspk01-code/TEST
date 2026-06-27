@@ -103,7 +103,7 @@
       gap: 4px;
     }
 
-    button {
+    .btn-main {
       width: 100%;
       background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
       color: white;
@@ -114,8 +114,29 @@
       border-radius: 6px;
       cursor: pointer;
       text-transform: uppercase;
+      margin-bottom: 5px;
     }
-    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    /* Nút xuất PDF thiết kế chuyên nghiệp */
+    .btn-pdf {
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+    }
 
     .loading {
       display: none;
@@ -127,6 +148,14 @@
     }
 
     .result-container { display: none; }
+    
+    /* VÙNG IN BAO BỌC CHÍNH XÁC ĐỂ XUẤT FILE KHÔNG LỖI */
+    #vung-in-bao-cao {
+      background: #ffffff;
+      padding: 4px;
+      width: 100%;
+    }
+
     .time-note {
       font-size: 8.5px;
       color: #64748b;
@@ -148,14 +177,12 @@
       color: #1e293b;
     }
 
-    /* Grid kết quả nén dạng danh bạ 2 cột trên màn hình điện thoại để chiếm cực ít khoảng trống */
     .grid-results {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 3px;
     }
     
-    /* Giao diện dòng ngang nén gọn thông tin, hỗ trợ tương tác nhấn vào */
     .card {
       background: rgba(255, 255, 255, 0.8);
       border-radius: 5px;
@@ -179,7 +206,6 @@
       text-overflow: ellipsis;
       margin-right: 4px;
     }
-    /* Ẩn hoàn toàn văn bản giải thích dài trên màn hình chính */
     .card-meaning {
       display: none;
     }
@@ -189,13 +215,12 @@
       text-align: right;
     }
 
-    /* Màu sắc cấu trúc */
     .sec-core { background: #f0f9ff; border-left: 2.5px solid #0284c7; }
     .sec-core .card-value { color: #0369a1; }
 
     .sec-power { background: #faf5ff; border-left: 2.5px solid #8b5cf6; }
     .sec-power .card-value { color: #6b21a8; }
-    .sec-power .grid-results { grid-template-columns: repeat(3, 1fr); } /* 3 cột cho khối ngắn */
+    .sec-power .grid-results { grid-template-columns: repeat(3, 1fr); }
 
     .sec-time { background: #fffbeb; border-left: 2.5px solid #d97706; }
     .sec-time .card-value { color: #b45309; }
@@ -205,7 +230,6 @@
 
     .karmic-debt { color: #dc2626 !important; }
 
-    /* Bảng chặng nén chặt kích thước di động */
     .table-container {
       overflow-x: hidden;
       border-radius: 4px;
@@ -228,7 +252,6 @@
     }
     .highlight-val { font-weight: 700; color: #1e3a8a; font-size: 11px; cursor: pointer; }
 
-    /* CHÂN TRANG ĐẶT LỊCH SIÊU GỌN */
     .booking-footer {
       margin-top: 6px;
       padding: 6px;
@@ -248,7 +271,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* GIAO DIỆN HỘP THOẠI POPUP MODAL */
+    /* POPUP MODAL LUẬN GIẢI */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -320,7 +343,6 @@
       text-transform: uppercase;
     }
 
-    /* HỖ TRỢ MÀN HÌNH PC/MÁY TÍNH LỚN: Tự dàn đều ra 3 cột cho đẹp mắt */
     @media (min-width: 768px) {
       body { padding: 20px; }
       .container { max-width: 900px; padding: 20px; border-radius: 20px; }
@@ -329,7 +351,8 @@
       .form-grid { grid-template-columns: 1.2fr 1fr; gap: 15px; }
       label { font-size: 11px; }
       input[type="text"], input[type="number"] { padding: 10px; font-size: 14px; }
-      button { padding: 12px; font-size: 14px; }
+      .btn-main { padding: 12px; font-size: 14px; }
+      .btn-pdf { padding: 14px; font-size: 14px; }
       .grid-results { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
       .card { padding: 10px 12px; }
       .card-title { font-size: 12px; }
@@ -363,89 +386,98 @@
         </div>
       </div>
     </div>
-    <button id="btnTraCuu" onclick="runCalculations()">Khai Mở Năng Lượng Bản Đồ</button>
+    <button class="btn-main" id="btnTraCuu" onclick="runCalculations()">Khai Mở Năng Lượng Bản Đồ</button>
   </div>
   
   <div class="loading" id="loadingText">Đang liên kết dữ liệu sóng năng lượng...</div>
   
   <div class="result-container" id="resultsBlock">
-    <div class="time-note" id="currentTimeInfo"></div>
     
-    <div class="energy-section sec-core">
-      <div class="section-title">Chỉ Số Cốt Lõi & Tính Cách</div>
-      <div class="grid-results">
-        <div class="card" onclick="showPopup('1. Đường Đời', 'valDuongDoi')"><span class="card-title">1. Đường Đời</span><div class="card-value" id="valDuongDoi">-</div></div>
-        <div class="card" onclick="showPopup('2. Sứ Mệnh', 'valSuMenh')"><span class="card-title">2. Sứ Mệnh</span><div class="card-value" id="valSuMenh">-</div></div>
-        <div class="card" onclick="showPopup('3. LK Đường Đời - Sứ Mệnh', 'valLkDDSM')"><span class="card-title">3. LK ĐĐ - SM</span><div class="card-value" id="valLkDDSM">-</div></div>
-        <div class="card" onclick="showPopup('4. Trưởng Thành', 'valTruongThanh')"><span class="card-title">4. Trưởng Thành</span><div class="card-value" id="valTruongThanh">-</div></div>
-        <div class="card" onclick="showPopup('5. Linh Hồn', 'valLinhHon')"><span class="card-title">5. Linh Hồn</span><div class="card-value" id="valLinhHon">-</div></div>
-        <div class="card" onclick="showPopup('6. Nhân Cách', 'valNhanCach')"><span class="card-title">6. Nhân Cách</span><div class="card-value" id="valNhanCach">-</div></div>
-        <div class="card" onclick="showPopup('7. LK Linh Hồn - Nhân Cách', 'valLkLHNC')"><span class="card-title">7. LK LH - NC</span><div class="card-value" id="valLkLHNC">-</div></div>
-        <div class="card" onclick="showPopup('8. Cân Bằng', 'valCanBang')"><span class="card-title">8. Cân Bằng</span><div class="card-value" id="valCanBang">-</div></div>
-        <div class="card" onclick="showPopup('9. Tư Duy Lý Trí', 'valTuDuyLyTri')"><span class="card-title">9. Tư Duy Lý Trí</span><div class="card-value" id="valTuDuyLyTri">-</div></div>
-        <div class="card" onclick="showPopup('19. Ngày Sinh', 'valNgaySinh')"><span class="card-title">19. Ngày Sinh</span><div class="card-value" id="valNgaySinh">-</div></div>
+    <div id="vung-in-bao-cao">
+      <div class="time-note" id="currentTimeInfo"></div>
+      
+      <div class="energy-section sec-core">
+        <div class="section-title">Chỉ Số Cốt Lõi & Tính Cách</div>
+        <div class="grid-results">
+          <div class="card" onclick="showPopup('1. Đường Đời', 'valDuongDoi')"><span class="card-title">1. Đường Đời</span><div class="card-value" id="valDuongDoi">-</div></div>
+          <div class="card" onclick="showPopup('2. Sứ Mệnh', 'valSuMenh')"><span class="card-title">2. Sứ Mệnh</span><div class="card-value" id="valSuMenh">-</div></div>
+          <div class="card" onclick="showPopup('3. LK Đường Đời - Sứ Mệnh', 'valLkDDSM')"><span class="card-title">3. LK ĐĐ - SM</span><div class="card-value" id="valLkDDSM">-</div></div>
+          <div class="card" onclick="showPopup('4. Trưởng Thành', 'valTruongThanh')"><span class="card-title">4. Trưởng Thành</span><div class="card-value" id="valTruongThanh">-</div></div>
+          <div class="card" onclick="showPopup('5. Linh Hồn', 'valLinhHon')"><span class="card-title">5. Linh Hồn</span><div class="card-value" id="valLinhHon">-</div></div>
+          <div class="card" onclick="showPopup('6. Nhân Cách', 'valNhanCach')"><span class="card-title">6. Nhân Cách</span><div class="card-value" id="valNhanCach">-</div></div>
+          <div class="card" onclick="showPopup('7. LK Linh Hồn - Nhân Cách', 'valLkLHNC')"><span class="card-title">7. LK LH - NC</span><div class="card-value" id="valLkLHNC">-</div></div>
+          <div class="card" onclick="showPopup('8. Cân Bằng', 'valCanBang')"><span class="card-title">8. Cân Bằng</span><div class="card-value" id="valCanBang">-</div></div>
+          <div class="card" onclick="showPopup('9. Tư Duy Lý Trí', 'valTuDuyLyTri')"><span class="card-title">9. Tư Duy Lý Trí</span><div class="card-value" id="valTuDuyLyTri">-</div></div>
+          <div class="card" onclick="showPopup('19. Ngày Sinh', 'valNgaySinh')"><span class="card-title">19. Ngày Sinh</span><div class="card-value" id="valNgaySinh">-</div></div>
+        </div>
+      </div>
+
+      <div class="energy-section sec-power">
+        <div class="section-title">Năng Lực & Ưu Nhược Điểm</div>
+        <div class="grid-results">
+          <div class="card" onclick="showPopup('10. Sức Mạnh Tiềm Thức', 'valTiemThuc')"><span class="card-title">10. Tiềm Thức</span><div class="card-value" id="valTiemThuc">-</div></div>
+          <div class="card" onclick="showPopup('11. Chỉ Số Đam Mê', 'valDamMe')"><span class="card-title">11. Đam Mê</span><div class="card-value" id="valDamMe">-</div></div>
+          <div class="card" onclick="showPopup('12. Chỉ Số Thiếu', 'valThieu')"><span class="card-title">12. Số Thiếu</span><div class="card-value" id="valThieu">-</div></div>
+        </div>
+      </div>
+
+      <div class="energy-section sec-time">
+        <div class="section-title">Dự Báo Cá Nhân Hiện Tại</div>
+        <div class="grid-results">
+          <div class="card" onclick="showPopup('13. Năm Cá Nhân', 'valNamCN')"><span class="card-title">13. Năm CN</span><div class="card-value" id="valNamCN">-</div></div>
+          <div class="card" onclick="showPopup('14. Tháng Cá Nhân', 'valThangCN')"><span class="card-title">14. Tháng CN</span><div class="card-value" id="valThangCN">-</div></div>
+          <div class="card" onclick="showPopup('15. Ngày Cá Nhân', 'valNgayCN')"><span class="card-title">15. Ngày CN</span><div class="card-value" id="valNgayCN">-</div></div>
+        </div>
+      </div>
+
+      <div class="energy-section sec-map">
+        <div class="section-title">Bản Đồ Chặng & Thách Thức</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Chặng (Tuổi)</th>
+                <th>Chỉ số</th>
+                <th>Thách thức</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>C1</b> (<span id="ageC1">-</span>)</td>
+                <td class="highlight-val" id="valC1" onclick="showPopup('Chặng 1', 'valC1')">-</td>
+                <td class="highlight-val" style="color:#dc2626;" id="valTT1" onclick="showPopup('Thách Thức Chặng 1', 'valTT1')">-</td>
+              </tr>
+              <tr>
+                <td><b>C2</b> (<span id="ageC2">-</span>)</td>
+                <td class="highlight-val" id="valC2" onclick="showPopup('Chặng 2', 'valC2')">-</td>
+                <td class="highlight-val" style="color:#dc2626;" id="valTT2" onclick="showPopup('Thách Thức Chặng 2', 'valTT2')">-</td>
+              </tr>
+              <tr>
+                <td><b>C3</b> (<span id="ageC3">-</span>)</td>
+                <td class="highlight-val" id="valC3" onclick="showPopup('Chặng 3', 'valC3')">-</td>
+                <td class="highlight-val" style="color:#dc2626;" id="valTT3" onclick="showPopup('Thách Thức Chặng 3', 'valTT3')">-</td>
+              </tr>
+              <tr>
+                <td><b>C4</b> (<span id="ageC4">-</span>)</td>
+                <td class="highlight-val" id="valC4" onclick="showPopup('Chặng 4', 'valC4')">-</td>
+                <td class="highlight-val" style="color:#dc2626;" id="valTT4" onclick="showPopup('Thách Thức Chặng 4', 'valTT4')">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="booking-footer">
+        <p>Để thấu hiểu sâu sắc bản đồ cuộc đời và kích hoạt tối ưu</p>
+        <div class="phone-number">ĐẶT LỊCH LUẬN GIẢI: 0931547687</div>
       </div>
     </div>
+    
+    <button class="btn-pdf" id="btnDownloadPDF" onclick="tailePDFReal()">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right:2px;"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+      <span id="textNutPDF">Xuất File Báo Cáo (PDF)</span>
+    </button>
 
-    <div class="energy-section sec-power">
-      <div class="section-title">Năng Lực & Ưu Nhược Điểm</div>
-      <div class="grid-results">
-        <div class="card" onclick="showPopup('10. Sức Mạnh Tiềm Thức', 'valTiemThuc')"><span class="card-title">10. Tiềm Thức</span><div class="card-value" id="valTiemThuc">-</div></div>
-        <div class="card" onclick="showPopup('11. Chỉ Số Đam Mê', 'valDamMe')"><span class="card-title">11. Đam Mê</span><div class="card-value" id="valDamMe">-</div></div>
-        <div class="card" onclick="showPopup('12. Chỉ Số Thiếu', 'valThieu')"><span class="card-title">12. Số Thiếu</span><div class="card-value" id="valThieu">-</div></div>
-      </div>
-    </div>
-
-    <div class="energy-section sec-time">
-      <div class="section-title">Dự Báo Cá Nhân Hiện Tại</div>
-      <div class="grid-results">
-        <div class="card" onclick="showPopup('13. Năm Cá Nhân', 'valNamCN')"><span class="card-title">13. Năm CN</span><div class="card-value" id="valNamCN">-</div></div>
-        <div class="card" onclick="showPopup('14. Tháng Cá Nhân', 'valThangCN')"><span class="card-title">14. Tháng CN</span><div class="card-value" id="valThangCN">-</div></div>
-        <div class="card" onclick="showPopup('15. Ngày Cá Nhân', 'valNgayCN')"><span class="card-title">15. Ngày CN</span><div class="card-value" id="valNgayCN">-</div></div>
-      </div>
-    </div>
-
-    <div class="energy-section sec-map">
-      <div class="section-title">Bản Đồ Chặng & Thách Thức</div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Chặng (Tuổi)</th>
-              <th>Chỉ số</th>
-              <th>Thách thức</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>C1</b> (<span id="ageC1">-</span>)</td>
-              <td class="highlight-val" id="valC1" onclick="showPopup('Chặng 1', 'valC1')">-</td>
-              <td class="highlight-val" style="color:#dc2626;" id="valTT1" onclick="showPopup('Thách Thức Chặng 1', 'valTT1')">-</td>
-            </tr>
-            <tr>
-              <td><b>C2</b> (<span id="ageC2">-</span>)</td>
-              <td class="highlight-val" id="valC2" onclick="showPopup('Chặng 2', 'valC2')">-</td>
-              <td class="highlight-val" style="color:#dc2626;" id="valTT2" onclick="showPopup('Thách Thức Chặng 2', 'valTT2')">-</td>
-            </tr>
-            <tr>
-              <td><b>C3</b> (<span id="ageC3">-</span>)</td>
-              <td class="highlight-val" id="valC3" onclick="showPopup('Chặng 3', 'valC3')">-</td>
-              <td class="highlight-val" style="color:#dc2626;" id="valTT3" onclick="showPopup('Thách Thức Chặng 3', 'valTT3')">-</td>
-            </tr>
-            <tr>
-              <td><b>C4</b> (<span id="ageC4">-</span>)</td>
-              <td class="highlight-val" id="valC4" onclick="showPopup('Chặng 4', 'valC4')">-</td>
-              <td class="highlight-val" style="color:#dc2626;" id="valTT4" onclick="showPopup('Thách Thức Chặng 4', 'valTT4')">-</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="booking-footer">
-    <p>Để thấu hiểu sâu sắc bản đồ cuộc đời và kích hoạt tối ưu</p>
-    <div class="phone-number">ĐẶT LỊCH LUẬN GIẢI: 0931547687</div>
   </div>
 </div>
 
@@ -458,11 +490,9 @@
   </div>
 </div>
 
-<script>
-  /* =========================================================================
-     THUẬT TOÁN LOGIC TÍNH TOÁN - VẬN HÀNH TRỰC TIẾP TRÊN TRÌNH DUYỆT
-     ========================================================================= */
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+<script>
   function isMasterNumber(num) {
     return num === 11 || num === 22 || num === 33;
   }
@@ -653,13 +683,10 @@
       namCaNhan: namCaNhan, thangCaNhan: thangCaNhan, ngayCaNhan: ngayCaNhan,
       chang: { c1: chang1, t1: tuoiChang1, c2: chang2, t2: tuoiChang2, c3: chang3, t3: tuoiChang3, c4: chang4, t4: tuoiChang4 },
       thachThuc: { tt1: tt1, tt2: tt2, tt3: tt3, tt4: tt4 },
-      ngaySinh: ngaySinh, currentDateInfo: `${currentDay}/${currentMonth}/${currentYear}`
+      ngaySinh: ngaySinh, currentDateInfo: `Ngày xem: ${currentDay}/${currentMonth}/${currentYear}`
     };
   }
 
-  /* =========================================================================
-     TỪ ĐIỂN ĐỊNH NGHĨA Ý NGHĨA SÓNG RUNG NĂNG LƯỢNG (DÙNG CHO POPUP)
-     ========================================================================= */
   const numerologyMeanings = {
     "1": "Tiên phong, độc lập, quyết đoán và mang phẩm chất của một nhà lãnh đạo dẫn đường.",
     "2": "Hòa bình, thấu hiểu, giàu lòng trắc ẩn, kết nối và sở hữu trực giác cực kỳ nhạy bén.",
@@ -742,9 +769,6 @@
     }
   }
 
-  /* =========================================================================
-     CƠ CHẾ ĐIỀU KHIỂN ĐÓNG/MỞ POPUP LUẬN GIẢI
-     ========================================================================= */
   function showPopup(titleName, valueId) {
     const valueElement = document.getElementById(valueId);
     if (!valueElement || valueElement.innerText === "-") return;
@@ -753,7 +777,6 @@
     document.getElementById('modalLabel').innerText = titleName;
     document.getElementById('modalNumber').innerText = numValue;
     
-    // Tùy biến nội dung dựa trên chỉ số đặc thù không có trong từ điển basic
     if (valueId === 'valDamMe') {
       document.getElementById('modalDesc').innerText = "Số " + numValue + " là năng lực/tần số vượt trội lặp đi lặp lại nhiều lần trong họ tên, thể hiện niềm khao khát và sở trường bẩm sinh bạn muốn thực hiện.";
     } else if (valueId === 'valThieu') {
@@ -799,7 +822,6 @@
         document.getElementById('loadingText').style.display = 'none';
         document.getElementById('resultsBlock').style.display = 'block';
         
-        // Cập nhật giá trị vào các ô
         formatAndDisplayKarmic('valDuongDoi', res.duongDoi, res);
         formatAndDisplayKarmic('valSuMenh', res.suMenh, res);
         formatAndDisplayKarmic('valLkDDSM', res.lienKetDDSM, res);
@@ -815,127 +837,95 @@
         document.getElementById('valDamMe').innerText = res.damMe;
         document.getElementById('valThieu').innerText = res.thieu;
         
-        document.getElementById('currentTimeInfo').innerText = 'Ngày tra cứu: ' + res.currentDateInfo;
         document.getElementById('valNamCN').innerText = res.namCaNhan;
         document.getElementById('valThangCN').innerText = res.thangCaNhan;
         document.getElementById('valNgayCN').innerText = res.ngayCaNhan;
         
         document.getElementById('valC1').innerText = res.chang.c1;
-        document.getElementById('ageC1').innerText = '0-' + res.chang.t1 + 't';
+        document.getElementById('ageC1').innerText = `0-${res.chang.t1}t`;
         document.getElementById('valC2').innerText = res.chang.c2;
-        document.getElementById('ageC2').innerText = (res.chang.t1 + 1) + '-' + res.chang.t2 + 't';
+        document.getElementById('ageC2').innerText = `${res.chang.t1+1}-${res.chang.t2}t`;
         document.getElementById('valC3').innerText = res.chang.c3;
-        document.getElementById('ageC3').innerText = (res.chang.t2 + 1) + '-' + res.chang.t3 + 't';
+        document.getElementById('ageC3').innerText = `${res.chang.t2+1}-${res.chang.t3}t`;
         document.getElementById('valC4').innerText = res.chang.c4;
-        document.getElementById('ageC4').innerText = (res.chang.t3 + 1) + 't+';
+        document.getElementById('ageC4').innerText = `${res.chang.t3+1}t+`;
         
         document.getElementById('valTT1').innerText = res.thachThuc.tt1;
         document.getElementById('valTT2').innerText = res.thachThuc.tt2;
         document.getElementById('valTT3').innerText = res.thachThuc.tt3;
         document.getElementById('valTT4').innerText = res.thachThuc.tt4;
         
-      } catch (err) {
+        document.getElementById('currentTimeInfo').innerText = res.currentDateInfo;
+        
+      } catch(e) {
+        alert("Lỗi tính toán: " + e.message);
         btn.disabled = false;
         btn.innerText = "Khai Mở Năng Lượng Bản Đồ";
         document.getElementById('loadingText').style.display = 'none';
-        alert('Lỗi tính toán: ' + err.message);
       }
-    }, 600);
-  }
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<div class="zalo-popup-widget">
-  <a href="https://zalo.me/0931547687" target="_blank" rel="noopener noreferrer" title="Chat qua Zalo">
-    <div class="zalo-glow-circle"></div>
-    <div class="zalo-glow-circle-2"></div>
-    <div class="zalo-icon-wrapper">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="36" height="36">
-        <path fill="#FFF" d="M25.6,18.9c-0.2-0.5-0.6-0.9-1.2-1.1c-0.6-0.2-1.2-0.2-1.8,0.1l-6.1,3.4l-0.1-5c0-0.7-0.3-1.3-0.8-1.7 c-0.5-0.4-1.2-0.6-1.9-0.4l-3.3,0.8c-0.7,0.2-1.2,0.7-1.4,1.4c-0.2,0.7,0,1.4,0.5,1.9l4.8,4.8l-2.4,5.4c-0.3,0.6-0.2,1.3,0.1,1.8 c0.3,0.5,0.9,0.9,1.5,1c0.2,0,0.4,0,0.6,0c0.4,0,0.9-0.1,1.2-0.4l8.3-5.9c0.5-0.4,0.8-1,0.8-1.6L25.6,18.9z"/>
-        <path fill="#FFF" fill-rule="evenodd" clip-rule="evenodd" d="M20,2C10.1,2,2,10.1,2,20s8.1,18,18,18s18-8.1,18-18S29.9,2,20,2z M29.1,23.3c0,1.2-0.5,2.3-1.4,3.1c-0.9,0.8-2.1,1.2-3.3,1.2H14.7c-0.8,0-1.6-0.2-2.3-0.6l-5.1,1.8c-0.4,0.1-0.8,0-1.1-0.2 c-0.3-0.2-0.5-0.6-0.5-1l0.6-5.4c-0.8-1-1.3-2.3-1.3-3.7c0-3.3,2.7-6,6-6h13.1c1.2,0,2.4,0.4,3.3,1.2c0.9,0.8,1.4,2,1.4,3.1V23.3z"/>
-      </svg>
-    </div>
-    <span class="zalo-text-tooltip">Chat với chúng tôi</span>
-  </a>
-</div>
-
-<div class="pdf-popup-widget">
-  <button onclick="xuatPDFThuVien()" class="btn-xuat-pdf" id="btnXuatPDF" title="Tải file PDF báo cáo">
-    <div class="pdf-icon-wrapper">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-      </svg>
-    </div>
-    <span class="pdf-text-tooltip" id="pdfTooltipText">Tải file PDF</span>
-  </button>
-</div>
-
-<style>
-.zalo-popup-widget { position: fixed !important; bottom: 25px !important; right: 25px !important; z-index: 999999 !important; display: block !important; width: 60px !important; height: 60px !important; }
-.zalo-icon-wrapper { position: absolute !important; width: 60px !important; height: 60px !important; background-color: #0068ff !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 15px rgba(0, 104, 255, 0.4) !important; z-index: 3 !important; transition: all 0.3s ease !important; animation: zalo-shake 3s infinite ease-in-out !important; }
-.zalo-glow-circle, .zalo-glow-circle-2 { position: absolute !important; top: 0 !important; left: 0 !important; width: 60px !important; height: 60px !important; background-color: rgba(0, 104, 255, 0.4) !important; border-radius: 50% !important; z-index: 1 !important; animation: zalo-glow 2s infinite ease-out !important; }
-.zalo-glow-circle-2 { background-color: rgba(0, 104, 255, 0.2) !important; z-index: 2 !important; animation-delay: 0.6s !important; }
-.zalo-popup-widget:hover .zalo-icon-wrapper { transform: scale(1.1) !important; box-shadow: 0 6px 20px rgba(0, 104, 255, 0.6) !important; animation-play-state: paused !important; }
-.zalo-text-tooltip { position: absolute !important; right: 75px !important; top: 15px !important; background-color: rgba(0, 0, 0, 0.8) !important; color: #fff !important; padding: 7px 14px !important; border-radius: 20px !important; font-size: 13px !important; font-family: sans-serif !important; white-space: nowrap !important; opacity: 0 !important; visibility: hidden !important; transition: all 0.3s ease !important; transform: translateX(10px) !important; pointer-events: none !important; }
-.zalo-popup-widget:hover .zalo-text-tooltip { opacity: 1 !important; visibility: visible !important; transform: translateX(0) !important; }
-
-.pdf-popup-widget { position: fixed !important; bottom: 25px !important; left: 25px !important; z-index: 999999 !important; display: block !important; width: 60px !important; height: 60px !important; }
-.btn-xuat-pdf { position: absolute !important; top: 0 !important; left: 0 !important; width: 60px !important; height: 60px !important; background-color: #e74c3c !important; border: none !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important; cursor: pointer !important; z-index: 3 !important; transition: all 0.3s ease !important; color: white !important; padding: 0 !important; }
-.pdf-icon-wrapper { display: flex !important; align-items: center !important; justify-content: center !important; }
-.pdf-popup-widget:hover .btn-xuat-pdf { transform: scale(1.1) !important; box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important; }
-.pdf-text-tooltip { position: absolute !important; left: 75px !important; top: 15px !important; background-color: rgba(0, 0, 0, 0.8) !important; color: #fff !important; padding: 7px 14px !important; border-radius: 20px !important; font-size: 13px !important; font-family: sans-serif !important; white-space: nowrap !important; opacity: 0 !important; visibility: hidden !important; transition: all 0.3s ease !important; transform: translateX(-10px) !important; pointer-events: none !important; }
-.pdf-popup-widget:hover .pdf-text-tooltip { opacity: 1 !important; visibility: visible !important; transform: translateX(0) !important; }
-
-@keyframes zalo-shake { 0%, 100% { transform: rotate(0) scale(1); } 80% { transform: rotate(0) scale(1); } 84% { transform: rotate(8deg) scale(1.05); } 88% { transform: rotate(-8deg) scale(1.05); } 92% { transform: rotate(5deg) scale(1.05); } 96% { transform: rotate(-5deg) scale(1.05); } }
-@keyframes zalo-glow { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
-
-/* CSS ẩn các nút này nếu người dùng cố tình dùng lệnh in hệ thống */
-@media print { .zalo-popup-widget, .pdf-popup-widget { display: none !important; } }
-</style>
-
-<script>
-function xuatPDFThuVien() {
-  // 1. Kiểm tra xem có đang mở trong trình duyệt nội bộ (Zalo/FB) không
-  var isInApp = /FBAN|FBAV|Line|Zalo/i.test(navigator.userAgent);
-  if (isInApp) {
-    alert("Ứng dụng Zalo/Facebook đang chặn tính năng tải file. Bạn vui lòng bấm vào dấu 3 chấm (...) ở góc trên bên phải màn hình -> chọn 'Mở bằng trình duyệt' (Safari/Chrome) để tải file PDF nhé!");
-    return;
+    }, 800);
   }
 
-  // 2. Thay đổi trạng thái nút để người dùng biết hệ thống đang xử lý
-  var nutBam = document.getElementById("btnXuatPDF");
-  var nhanChu = document.getElementById("pdfTooltipText");
-  nutBam.style.backgroundColor = "#7f8c8d"; 
-  nhanChu.innerText = "Đang khởi tạo PDF...";
+  /* =========================================================================
+     HÀM XUẤT PDF CHỐNG TRẮNG TRANG TRÊN ĐIỆN THOẠI (DÙNG PHƯƠNG PHÁP CLONE)
+     ========================================================================= */
+  function tailePDFReal() {
+    var isInApp = /FBAN|FBAV|Line|Zalo/i.test(navigator.userAgent);
+    if (isInApp) {
+      alert("Trình duyệt nội bộ của Zalo đang chặn tính năng tải file tự động. Bạn vui lòng bấm vào dấu 3 chấm (...) ở góc trên bên phải -> chọn 'Mở bằng trình duyệt' (Chrome/Safari) để xuất file PDF thành công nhé!");
+      return;
+    }
 
-  // 3. Lấy vùng chứa nội dung báo cáo (Mặc định chụp toàn bộ thẻ body)
-  // Nếu báo cáo nằm trong 1 thẻ div cố định, bạn có thể thay thế document.body bằng thẻ đó.
-  var element = document.body; 
+    var nutBam = document.getElementById("btnDownloadPDF");
+    var chuNut = document.getElementById("textNutPDF");
+    
+    nutBam.disabled = true;
+    nutBam.style.background = "#7f8c8d";
+    chuNut.innerText = "Đang kết xuất PDF...";
 
-  // 4. Cấu hình chụp ảnh đóng gói PDF theo khổ giấy A4 NGANG (Landscape)
-  var opt = {
-    margin:       [5, 5, 5, 5], // Lề [trên, trái, dưới, phải] bằng mm
-    filename:     'Bao-Cao-Nang-Luong-So.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { 
-      scale: 2,           // Tăng độ nét của chữ và đường kẻ lên gấp đôi
-      useCORS: true,      // Cho phép load ảnh từ link ngoài nếu có
-      logging: false      // Tắt log debug
-    },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // CHUYỂN KHỔ NGANG CHUẨN A4
-  };
+    var nguonIn = document.getElementById("vung-in-bao-cao");
+    var tenKhachHang = document.getElementById("fullName").value.trim() || "Khach-Hang";
+    var tenFile = "Bao-Cao-Nang-Luong-So-" + removeVietnameseTones(tenKhachHang).replace(/\s+/g, "-") + ".pdf";
 
-  // 5. Chạy lệnh tạo và tự động tải xuống
-  html2pdf().set(opt).from(element).save().then(function() {
-    // Trả nút bấm về trạng thái ban đầu sau khi tải xong
-    nutBam.style.backgroundColor = "#e74c3c";
-    nhanChu.innerText = "Tải file PDF";
-  }).catch(function(error) {
-    alert("Có lỗi xảy ra khi tạo PDF: " + error);
-    nutBam.style.backgroundColor = "#e74c3c";
-    nhanChu.innerText = "Tải file PDF";
-  });
-}
+    // Khởi tạo bản sao ảo phẳng hóa để khử hoàn toàn lỗi CSS Grid di động
+    var banSaoTam = nguonIn.cloneNode(true);
+    banSaoTam.style.width = "760px"; // Định kích cỡ cố định cho cấu trúc in canvas mượt mà
+    banSaoTam.style.position = "absolute";
+    banSaoTam.style.left = "-9999px";
+    banSaoTam.style.top = "0px";
+    banSaoTam.style.background = "#ffffff";
+    banSaoTam.style.padding = "20px";
+    document.body.appendChild(banSaoTam);
+
+    // Cấu hình bản in khổ dọc (portrait) vừa khít trang
+    var opt = {
+      margin:       [10, 10, 10, 10],
+      filename:     tenFile,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { 
+        scale: 2, 
+        useCORS: true,
+        logging: false,
+        width: 760,
+        windowWidth: 760
+      },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(banSaoTam).save().then(function() {
+      document.body.removeChild(banSaoTam);
+      nutBam.disabled = false;
+      nutBam.style.background = "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)";
+      chuNut.innerText = "Xuất File Báo Cáo (PDF)";
+    }).catch(function(error) {
+      if(banSaoTam.parentNode) document.body.removeChild(banSaoTam);
+      alert("Lỗi xuất file: " + error);
+      nutBam.disabled = false;
+      nutBam.style.background = "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)";
+      chuNut.innerText = "Xuất File Báo Cáo (PDF)";
+    });
+  }
 </script>
+
 </body>
 </html>
