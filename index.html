@@ -1,3 +1,848 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TRA CỨU NĂNG LƯỢNG SỐ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+    body {
+      background: #f0f4f8;
+      color: #1e293b;
+      padding: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      padding: 10px;
+      position: relative;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #0f172a;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 15px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #6b21a8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .mandala-signature {
+      width: 24px;
+      height: 24px;
+      margin: 3px auto 8px auto;
+      border: 1.5px dashed #8b5cf6;
+      border-radius: 50%;
+      position: relative;
+      animation: spinMandala 20s linear infinite;
+      opacity: 0.6;
+    }
+    .mandala-signature::before, .mandala-signature::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border: 1.5px solid #3b82f6;
+    }
+    .mandala-signature::before { transform: rotate(30deg); border-color: #6366f1; }
+    .mandala-signature::after { transform: rotate(60deg); border-color: #ec4899; }
+    @keyframes spinMandala { 100% { transform: rotate(360deg); } }
+
+    /* Khu vực Input siêu gọn */
+    .search-box {
+      background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%);
+      border: 1px solid #c084fc;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 700;
+      font-size: 9px;
+      color: #5b21b6;
+      text-transform: uppercase;
+    }
+    
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ddd6fe;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+    }
+    input[type="number"] { text-align: center; }
+    .birth-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      color: white;
+      border: none;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 10px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #7c3aed;
+    }
+
+    .result-container { display: none; }
+    .time-note {
+      font-size: 8.5px;
+      color: #64748b;
+      margin-bottom: 4px;
+      text-align: right;
+    }
+
+    .energy-section {
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 5px;
+    }
+    
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      color: #1e293b;
+    }
+
+    /* Grid kết quả nén dạng danh bạ 2 cột trên màn hình điện thoại để chiếm cực ít khoảng trống */
+    .grid-results {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+    }
+    
+    /* Giao diện dòng ngang nén gọn thông tin, hỗ trợ tương tác nhấn vào */
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 5px;
+      padding: 5px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .card:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+    .card-title {
+      font-size: 10px;
+      color: #334155;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 4px;
+    }
+    /* Ẩn hoàn toàn văn bản giải thích dài trên màn hình chính */
+    .card-meaning {
+      display: none;
+    }
+    .card-value {
+      font-size: 13px; 
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* Màu sắc cấu trúc */
+    .sec-core { background: #f0f9ff; border-left: 2.5px solid #0284c7; }
+    .sec-core .card-value { color: #0369a1; }
+
+    .sec-power { background: #faf5ff; border-left: 2.5px solid #8b5cf6; }
+    .sec-power .card-value { color: #6b21a8; }
+    .sec-power .grid-results { grid-template-columns: repeat(3, 1fr); } /* 3 cột cho khối ngắn */
+
+    .sec-time { background: #fffbeb; border-left: 2.5px solid #d97706; }
+    .sec-time .card-value { color: #b45309; }
+    .sec-time .grid-results { grid-template-columns: repeat(3, 1fr); }
+
+    .sec-map { background: #f8fafc; border-left: 2.5px solid #475569; }
+
+    .karmic-debt { color: #dc2626 !important; }
+
+    /* Bảng chặng nén chặt kích thước di động */
+    .table-container {
+      overflow-x: hidden;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+    }
+    th, td {
+      padding: 4px;
+      text-align: center; 
+      font-size: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 600;
+    }
+    .highlight-val { font-weight: 700; color: #1e3a8a; font-size: 11px; cursor: pointer; }
+
+    /* CHÂN TRANG ĐẶT LỊCH SIÊU GỌN */
+    .booking-footer {
+      margin-top: 6px;
+      padding: 6px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .booking-footer p {
+      color: #cbd5e1;
+      font-size: 8.5px;
+      margin-bottom: 1px;
+    }
+    .booking-footer .phone-number {
+      color: #f43f5e;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    /* GIAO DIỆN HỘP THOẠI POPUP MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+    .modal-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .modal-number {
+      font-size: 36px;
+      font-weight: 800;
+      color: #7c3aed;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+    .modal-desc {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+      font-weight: 500;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    .modal-close-btn {
+      width: 100%;
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* HỖ TRỢ MÀN HÌNH PC/MÁY TÍNH LỚN: Tự dàn đều ra 3 cột cho đẹp mắt */
+    @media (min-width: 768px) {
+      body { padding: 20px; }
+      .container { max-width: 900px; padding: 20px; border-radius: 20px; }
+      h1 { font-size: 24px; }
+      .search-box { padding: 15px; margin-bottom: 15px; }
+      .form-grid { grid-template-columns: 1.2fr 1fr; gap: 15px; }
+      label { font-size: 11px; }
+      input[type="text"], input[type="number"] { padding: 10px; font-size: 14px; }
+      button { padding: 12px; font-size: 14px; }
+      .grid-results { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+      .card { padding: 10px 12px; }
+      .card-title { font-size: 12px; }
+      .card-value { font-size: 18px; }
+      th, td { padding: 10px; font-size: 13px; }
+      .highlight-val { font-size: 14px; }
+      .booking-footer { padding: 15px; margin-top: 15px; }
+      .booking-footer p { font-size: 12px; }
+      .booking-footer .phone-number { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>TRA CỨU NĂNG LƯỢNG SỐ</h1>
+  <div class="mandala-signature"></div>
+  
+  <div class="search-box">
+    <div class="form-grid">
+      <div>
+        <label for="fullName">Họ và Tên (Đầy đủ):</label>
+        <input type="text" id="fullName" placeholder="HỒ THƯƠNG THẢO" autocomplete="off">
+      </div>
+      <div>
+        <label>Ngày / Tháng / Năm sinh:</label>
+        <div class="birth-group">
+          <input type="number" id="inDay" placeholder="Ngày" min="1" max="31" oninput="if(value.length>2) value=value.slice(0,2)">
+          <input type="number" id="inMonth" placeholder="Tháng" min="1" max="12" oninput="if(value.length>2) value=value.slice(0,2)">
+          <input type="number" id="inYear" placeholder="Năm" min="1900" max="2030" oninput="if(value.length>4) value=value.slice(0,4)">
+        </div>
+      </div>
+    </div>
+    <button id="btnTraCuu" onclick="runCalculations()">Khai Mở Năng Lượng Bản Đồ</button>
+  </div>
+  
+  <div class="loading" id="loadingText">Đang liên kết dữ liệu sóng năng lượng...</div>
+  
+  <div class="result-container" id="resultsBlock">
+    <div class="time-note" id="currentTimeInfo"></div>
+    
+    <div class="energy-section sec-core">
+      <div class="section-title">Chỉ Số Cốt Lõi & Tính Cách</div>
+      <div class="grid-results">
+        <div class="card" onclick="showPopup('1. Đường Đời', 'valDuongDoi')"><span class="card-title">1. Đường Đời</span><div class="card-value" id="valDuongDoi">-</div></div>
+        <div class="card" onclick="showPopup('2. Sứ Mệnh', 'valSuMenh')"><span class="card-title">2. Sứ Mệnh</span><div class="card-value" id="valSuMenh">-</div></div>
+        <div class="card" onclick="showPopup('3. LK Đường Đời - Sứ Mệnh', 'valLkDDSM')"><span class="card-title">3. LK ĐĐ - SM</span><div class="card-value" id="valLkDDSM">-</div></div>
+        <div class="card" onclick="showPopup('4. Trưởng Thành', 'valTruongThanh')"><span class="card-title">4. Trưởng Thành</span><div class="card-value" id="valTruongThanh">-</div></div>
+        <div class="card" onclick="showPopup('5. Linh Hồn', 'valLinhHon')"><span class="card-title">5. Linh Hồn</span><div class="card-value" id="valLinhHon">-</div></div>
+        <div class="card" onclick="showPopup('6. Nhân Cách', 'valNhanCach')"><span class="card-title">6. Nhân Cách</span><div class="card-value" id="valNhanCach">-</div></div>
+        <div class="card" onclick="showPopup('7. LK Linh Hồn - Nhân Cách', 'valLkLHNC')"><span class="card-title">7. LK LH - NC</span><div class="card-value" id="valLkLHNC">-</div></div>
+        <div class="card" onclick="showPopup('8. Cân Bằng', 'valCanBang')"><span class="card-title">8. Cân Bằng</span><div class="card-value" id="valCanBang">-</div></div>
+        <div class="card" onclick="showPopup('9. Tư Duy Lý Trí', 'valTuDuyLyTri')"><span class="card-title">9. Tư Duy Lý Trí</span><div class="card-value" id="valTuDuyLyTri">-</div></div>
+        <div class="card" onclick="showPopup('19. Ngày Sinh', 'valNgaySinh')"><span class="card-title">19. Ngày Sinh</span><div class="card-value" id="valNgaySinh">-</div></div>
+      </div>
+    </div>
+
+    <div class="energy-section sec-power">
+      <div class="section-title">Năng Lực & Ưu Nhược Điểm</div>
+      <div class="grid-results">
+        <div class="card" onclick="showPopup('10. Sức Mạnh Tiềm Thức', 'valTiemThuc')"><span class="card-title">10. Tiềm Thức</span><div class="card-value" id="valTiemThuc">-</div></div>
+        <div class="card" onclick="showPopup('11. Chỉ Số Đam Mê', 'valDamMe')"><span class="card-title">11. Đam Mê</span><div class="card-value" id="valDamMe">-</div></div>
+        <div class="card" onclick="showPopup('12. Chỉ Số Thiếu', 'valThieu')"><span class="card-title">12. Số Thiếu</span><div class="card-value" id="valThieu">-</div></div>
+      </div>
+    </div>
+
+    <div class="energy-section sec-time">
+      <div class="section-title">Dự Báo Cá Nhân Hiện Tại</div>
+      <div class="grid-results">
+        <div class="card" onclick="showPopup('13. Năm Cá Nhân', 'valNamCN')"><span class="card-title">13. Năm CN</span><div class="card-value" id="valNamCN">-</div></div>
+        <div class="card" onclick="showPopup('14. Tháng Cá Nhân', 'valThangCN')"><span class="card-title">14. Tháng CN</span><div class="card-value" id="valThangCN">-</div></div>
+        <div class="card" onclick="showPopup('15. Ngày Cá Nhân', 'valNgayCN')"><span class="card-title">15. Ngày CN</span><div class="card-value" id="valNgayCN">-</div></div>
+      </div>
+    </div>
+
+    <div class="energy-section sec-map">
+      <div class="section-title">Bản Đồ Chặng & Thách Thức</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Chặng (Tuổi)</th>
+              <th>Chỉ số</th>
+              <th>Thách thức</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>C1</b> (<span id="ageC1">-</span>)</td>
+              <td class="highlight-val" id="valC1" onclick="showPopup('Chặng 1', 'valC1')">-</td>
+              <td class="highlight-val" style="color:#dc2626;" id="valTT1" onclick="showPopup('Thách Thức Chặng 1', 'valTT1')">-</td>
+            </tr>
+            <tr>
+              <td><b>C2</b> (<span id="ageC2">-</span>)</td>
+              <td class="highlight-val" id="valC2" onclick="showPopup('Chặng 2', 'valC2')">-</td>
+              <td class="highlight-val" style="color:#dc2626;" id="valTT2" onclick="showPopup('Thách Thức Chặng 2', 'valTT2')">-</td>
+            </tr>
+            <tr>
+              <td><b>C3</b> (<span id="ageC3">-</span>)</td>
+              <td class="highlight-val" id="valC3" onclick="showPopup('Chặng 3', 'valC3')">-</td>
+              <td class="highlight-val" style="color:#dc2626;" id="valTT3" onclick="showPopup('Thách Thức Chặng 3', 'valTT3')">-</td>
+            </tr>
+            <tr>
+              <td><b>C4</b> (<span id="ageC4">-</span>)</td>
+              <td class="highlight-val" id="valC4" onclick="showPopup('Chặng 4', 'valC4')">-</td>
+              <td class="highlight-val" style="color:#dc2626;" id="valTT4" onclick="showPopup('Thách Thức Chặng 4', 'valTT4')">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-footer">
+    <p>Để thấu hiểu sâu sắc bản đồ cuộc đời và kích hoạt tối ưu</p>
+    <div class="phone-number">ĐẶT LỊCH LUẬN GIẢI: 0931547687</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closePopup()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-label" id="modalLabel">Tên Chỉ Số</div>
+    <div class="modal-number" id="modalNumber">0</div>
+    <div class="modal-desc" id="modalDesc">Nội dung luận giải sóng rung năng lượng...</div>
+    <button class="modal-close-btn" onclick="closePopup()">Đóng lại</button>
+  </div>
+</div>
+
+<script>
+  /* =========================================================================
+     THUẬT TOÁN LOGIC TÍNH TOÁN - VẬN HÀNH TRỰC TIẾP TRÊN TRÌNH DUYỆT
+     ========================================================================= */
+
+  function isMasterNumber(num) {
+    return num === 11 || num === 22 || num === 33;
+  }
+
+  function reduceNumber(num, keepMaster) {
+    if (keepMaster === undefined) keepMaster = true;
+    while (num > 9) {
+      if (keepMaster && isMasterNumber(num)) return num;
+      let sum = 0;
+      let temp = num;
+      while (temp > 0) {
+        sum += temp % 10;
+        temp = Math.floor(temp / 10);
+      }
+      num = sum;
+    }
+    return num;
+  }
+
+  function removeVietnameseTones(str) {
+    str = str.toUpperCase();
+    str = str.replace(/[ÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴ]/g, "A");
+    str = str.replace(/[ÈÉẸẺẼÊỀẾỆỂỄ]/g, "E");
+    str = str.replace(/[ÌÍỊỈĨ]/g, "I");
+    str = str.replace(/[ÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]/g, "O");
+    str = str.replace(/[ÙÚỤỦŨƯỪỨỰỬỮ]/g, "U");
+    str = str.replace(/[ỲÝYỶỸ]/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    return str;
+  }
+
+  const letterToNumberMap = {
+    'A': 1, 'J': 1, 'S': 1, 'B': 2, 'K': 2, 'T': 2, 'C': 3, 'L': 3, 'U': 3,
+    'D': 4, 'M': 4, 'V': 4, 'E': 5, 'N': 5, 'W': 5, 'F': 6, 'O': 6, 'X': 6,
+    'G': 7, 'P': 7, 'Y': 7, 'H': 8, 'Q': 8, 'Z': 8, 'I': 9, 'R': 9
+  };
+
+  function analyzeWord(word) {
+    let vowels = [];
+    let consonants = [];
+    const baseVowels = ['A', 'E', 'I', 'O', 'U'];
+    for (let i = 0; i < word.length; i++) {
+      let char = word[i];
+      if (baseVowels.includes(char)) {
+        vowels.push({char: char, index: i});
+      } else if (char === 'Y') {
+        let hasOtherVowel = false;
+        for (let j = 0; j < word.length; j++) {
+          if (baseVowels.includes(word[j])) { hasOtherVowel = true; break; }
+        }
+        if (!hasOtherVowel) vowels.push({char: char, index: i});
+        else consonants.push({char: char, index: i});
+      } else {
+        if (letterToNumberMap[char]) consonants.push({char: char, index: i});
+      }
+    }
+    return { vowels: vowels, consonants: consonants };
+  }
+
+  function calculateNumerologyLocal(fullName, birthDateStr) {
+    const parts = birthDateStr.split('-'); 
+    const dayRaw = parseInt(parts[0], 10);
+    const monthRaw = parseInt(parts[1], 10);
+    const yearRaw = parseInt(parts[2], 10);
+    
+    const dBasic = reduceNumber(dayRaw, false);
+    const mBasic = reduceNumber(monthRaw, false);
+    const yBasic = reduceNumber(yearRaw, false);
+    
+    const dayReduced = reduceNumber(dayRaw, true);
+    const monthReduced = reduceNumber(monthRaw, true);
+    const yearReduced = reduceNumber(yearRaw, true);
+    
+    let duongDoiRaw = dayReduced + monthReduced + yearReduced;
+    let duongDoi = reduceNumber(duongDoiRaw, true);
+    
+    const cleanName = removeVietnameseTones(fullName).trim();
+    const words = cleanName.split(/\s+/);
+    
+    let wordSứMệnhValues = [];
+    let allVowelsNumbers = [];
+    let allConsonantsNumbers = [];
+    let firstLettersNumbers = [];
+    let presentNumbers = {};
+    
+    words.forEach(word => {
+      if(word.length > 0) {
+        let firstChar = word[0];
+        if(letterToNumberMap[firstChar]) firstLettersNumbers.push(letterToNumberMap[firstChar]);
+      }
+      let analysis = analyzeWord(word);
+      let wordSum = 0;
+      for(let i=0; i<word.length; i++) {
+        let num = letterToNumberMap[word[i]];
+        if(num) { wordSum += num; presentNumbers[num] = true; }
+      }
+      wordSứMệnhValues.push(reduceNumber(wordSum, true));
+      analysis.vowels.forEach(v => allVowelsNumbers.push(letterToNumberMap[v.char]));
+      analysis.consonants.forEach(c => allConsonantsNumbers.push(letterToNumberMap[c.char]));
+    });
+    
+    let sumSuMenh = wordSứMệnhValues.reduce((a, b) => a + b, 0);
+    let suMenh = reduceNumber(sumSuMenh, true);
+    
+    let ddValueForLk = reduceNumber(duongDoi, false); 
+    let smValueForLk = reduceNumber(suMenh, false);
+    let lienKetDDSM = Math.abs(ddValueForLk - smValueForLk);
+    
+    let truongThanh = reduceNumber(duongDoi + suMenh, true);
+    let linhHonSum = allVowelsNumbers.reduce((a, b) => a + b, 0);
+    let linhHon = reduceNumber(linhHonSum, true);
+    let nhanCachSum = allConsonantsNumbers.reduce((a, b) => a + b, 0);
+    let nhanCach = reduceNumber(nhanCachSum, true);
+    
+    let lhValueForLk = reduceNumber(linhHon, false);
+    let ncValueForLk = reduceNumber(nhanCach, false);
+    let lienKetLHNC = Math.abs(lhValueForLk - ncValueForLk);
+    
+    let canBangSum = firstLettersNumbers.reduce((a, b) => a + b, 0);
+    let canBang = reduceNumber(canBangSum, true);
+    
+    let tenRieng = words[words.length - 1] || "";
+    let tenRiengSum = 0;
+    for(let i=0; i<tenRieng.length; i++) {
+      tenRiengSum += letterToNumberMap[tenRieng[i]] || 0;
+    }
+    let tenRiengReduced = reduceNumber(tenRiengSum, true);
+    let tuDuyLyTri = reduceNumber(tenRiengReduced + dBasic, true);
+    
+    let thieu = [];
+    for (let i = 1; i <= 9; i++) {
+      if (!presentNumbers[i]) thieu.push(i);
+    }
+    
+    let sucManhTiemThuc = 9 - thieu.length;
+    let counts = {};
+    let maxCount = 0;
+    words.forEach(word => {
+      for(let i=0; i<word.length; i++) {
+        let num = letterToNumberMap[word[i]];
+        if(num) {
+          counts[num] = (counts[num] || 0) + 1;
+          if(counts[num] > maxCount) maxCount = counts[num];
+        }
+      }
+    });
+    let damMe = [];
+    if (maxCount > 1) {
+      for (let num in counts) {
+        if (counts[num] === maxCount) damMe.push(parseInt(num, 10));
+      }
+    }
+    
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; 
+    const currentDay = now.getDate();
+    
+    let namVuTru = reduceNumber(currentYear, false);
+    let namCaNhan = reduceNumber(dBasic + mBasic + namVuTru, false);
+    let thangCaNhan = reduceNumber(namCaNhan + currentMonth, false);
+    let ngayCaNhan = reduceNumber(thangCaNhan + currentDay, false);
+    
+    let chang1 = reduceNumber(dBasic + mBasic, true);
+    let chang2 = reduceNumber(dBasic + yBasic, true);
+    let chang3 = reduceNumber(chang1 + chang2, true);
+    let chang4 = reduceNumber(mBasic + yBasic, true);
+    
+    let ddBasic = reduceNumber(duongDoi, false); 
+    let tuoiChang1 = 36 - ddBasic;
+    let tuoiChang2 = tuoiChang1 + 9;
+    let tuoiChang3 = tuoiChang2 + 9;
+    let tuoiChang4 = tuoiChang3 + 9;
+    
+    let tt1 = Math.abs(dBasic - mBasic);
+    let tt2 = Math.abs(dBasic - yBasic);
+    let tt3 = Math.abs(tt1 - tt2);
+    let tt4 = Math.abs(mBasic - yBasic);
+    
+    let ngaySinh = reduceNumber(dayRaw, true);
+    
+    return {
+      duongDoi: duongDoi, suMenh: suMenh, lienKetDDSM: lienKetDDSM, truongThanh: truongThanh,
+      linhHon: linhHon, nhanCach: nhanCach, lienKetLHNC: lienKetLHNC, canBang: canBang,
+      tuDuyLyTri: tuDuyLyTri, sucManhTiemThuc: sucManhTiemThuc,
+      damMe: damMe.join(', ') || 'Không có số vượt trội',
+      thieu: thieu.join(', ') || 'Không thiếu số nào',
+      namCaNhan: namCaNhan, thangCaNhan: thangCaNhan, ngayCaNhan: ngayCaNhan,
+      chang: { c1: chang1, t1: tuoiChang1, c2: chang2, t2: tuoiChang2, c3: chang3, t3: tuoiChang3, c4: chang4, t4: tuoiChang4 },
+      thachThuc: { tt1: tt1, tt2: tt2, tt3: tt3, tt4: tt4 },
+      ngaySinh: ngaySinh, currentDateInfo: `${currentDay}/${currentMonth}/${currentYear}`
+    };
+  }
+
+  /* =========================================================================
+     TỪ ĐIỂN ĐỊNH NGHĨA Ý NGHĨA SÓNG RUNG NĂNG LƯỢNG (DÙNG CHO POPUP)
+     ========================================================================= */
+  const numerologyMeanings = {
+    "1": "Tiên phong, độc lập, quyết đoán và mang phẩm chất của một nhà lãnh đạo dẫn đường.",
+    "2": "Hòa bình, thấu hiểu, giàu lòng trắc ẩn, kết nối và sở hữu trực giác cực kỳ nhạy bén.",
+    "3": "Sáng tạo, giao tiếp hoạt ngôn, tràn đầy năng lượng tích cực và khả năng truyền cảm hứng.",
+    "4": "Kỷ luật, vững chãi, thực tế, làm việc theo quy trình bài bản và là nền móng đáng tin cậy.",
+    "5": "Tự do, phiêu lưu, đam mê đổi mới, thích ứng linh hoạt và có khả năng tạo đột phá lớn.",
+    "6": "Yêu thương vô điều kiện, hướng về gia đình, có tâm thế phụng sự và chữa lành tâm hồn.",
+    "7": "Trí tuệ sâu sắc, đam mê triết học, thích chiêm nghiệm và sở hữu chiều sâu tâm linh lớn.",
+    "8": "Điều hành xuất sắc, có duyên với tài chính, đại diện cho quyền lực thực tế và quy luật nhân quả.",
+    "9": "Nhân đạo, mang lý tưởng bao dung cao cả, giàu lòng vị tha và đại diện cho sự hoàn thành viên mãn.",
+    "11": "Con số Master: Trực giác tâm linh nhạy bén, người truyền tải thông điệp vũ trụ và đánh thức tiềm năng.",
+    "22": "Con số Master: Nhà kiến tạo vĩ đại, sở hữu năng lực hiện thực hóa những ước mơ siêu thực thành đời thực.",
+    "33": "Con số Master: Bậc thầy chữa lành, dẫn dắt thế giới bằng tình yêu thương và đại từ bi tâm.",
+    "13/4": "Chỉ số Nợ nghiệp 13/4: Bài học về sự kiên trì, vượt qua lười biếng và rèn luyện ý chí nhất quán.",
+    "14/5": "Chỉ số Nợ nghiệp 14/5: Bài học về việc kiểm soát cảm xúc, ham muốn, tránh sa đà vào sự quá độ.",
+    "16/7": "Chỉ số Nợ nghiệp 16/7: Bài học rũ bỏ cái tôi ngạo mạn, thức tỉnh tâm thức qua các biến động cuộc sống.",
+    "19/1": "Chỉ số Nợ nghiệp 19/1: Bài học về việc học cách tự lập hoàn toàn, tránh độc đoán và áp đặt người khác."
+  };
+
+  function getNumberMeaning(valStr) {
+    if (!valStr) return "Chưa cập nhật năng lượng.";
+    const cleanVal = String(valStr).trim();
+    if (numerologyMeanings[cleanVal]) return numerologyMeanings[cleanVal];
+    for (let key in numerologyMeanings) {
+      if (cleanVal.includes(key)) return numerologyMeanings[key];
+    }
+    return "Mang làn sóng năng lượng đặc biệt, cần kết hợp phân tích chuyên sâu.";
+  }
+
+  function formatAndDisplayKarmic(elementId, originalValue, resContext) {
+    try {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+
+      if (originalValue === undefined || originalValue === null) {
+        element.innerText = "-";
+        return;
+      }
+
+      let finalDisplay = String(originalValue).trim();
+      let isKarmic = false;
+
+      if (finalDisplay.includes('/') || ['13', '14', '16', '19'].includes(finalDisplay)) {
+        if (finalDisplay === '13') finalDisplay = '13/4';
+        if (finalDisplay === '14') finalDisplay = '14/5';
+        if (finalDisplay === '16') finalDisplay = '16/7';
+        if (finalDisplay === '19') finalDisplay = '19/1';
+        isKarmic = true;
+      } else {
+        const valNum = parseInt(finalDisplay, 10);
+        if (elementId === 'valNgaySinh') {
+          const dayInput = parseInt(document.getElementById('inDay').value, 10);
+          if ([13, 14, 16, 19].includes(dayInput)) {
+            if (dayInput === 13) finalDisplay = '13/4';
+            if (dayInput === 14) finalDisplay = '14/5';
+            if (dayInput === 16) finalDisplay = '16/7';
+            if (dayInput === 19) finalDisplay = '19/1';
+            isKarmic = true;
+          }
+        }
+        if (elementId === 'valTruongThanh' && valNum === 7 && resContext) {
+          const ddNum = parseInt(resContext.duongDoi || 0, 10);
+          const smNum = parseInt(resContext.suMenh || 0, 10);
+          if ([16, 25, 34, 43].includes(ddNum + smNum)) { finalDisplay = '16/7'; isKarmic = true; }
+          if ((ddNum + smNum) === 13) { finalDisplay = '13/4'; isKarmic = true; }
+          if ((ddNum + smNum) === 14) { finalDisplay = '14/5'; isKarmic = true; }
+          if ((ddNum + smNum) === 19) { finalDisplay = '19/1'; isKarmic = true; }
+        }
+      }
+
+      element.innerText = finalDisplay;
+
+      if (isKarmic || finalDisplay.includes('13/4') || finalDisplay.includes('14/5') || finalDisplay.includes('16/7') || finalDisplay.includes('19/1')) {
+        element.classList.add('karmic-debt');
+      } else {
+        element.classList.remove('karmic-debt');
+      }
+    } catch(e) {
+      console.log("Lỗi hiển thị chỉ số " + elementId + ": ", e);
+    }
+  }
+
+  /* =========================================================================
+     CƠ CHẾ ĐIỀU KHIỂN ĐÓNG/MỞ POPUP LUẬN GIẢI
+     ========================================================================= */
+  function showPopup(titleName, valueId) {
+    const valueElement = document.getElementById(valueId);
+    if (!valueElement || valueElement.innerText === "-") return;
+    
+    const numValue = valueElement.innerText;
+    document.getElementById('modalLabel').innerText = titleName;
+    document.getElementById('modalNumber').innerText = numValue;
+    
+    // Tùy biến nội dung dựa trên chỉ số đặc thù không có trong từ điển basic
+    if (valueId === 'valDamMe') {
+      document.getElementById('modalDesc').innerText = "Số " + numValue + " là năng lực/tần số vượt trội lặp đi lặp lại nhiều lần trong họ tên, thể hiện niềm khao khát và sở trường bẩm sinh bạn muốn thực hiện.";
+    } else if (valueId === 'valThieu') {
+      document.getElementById('modalDesc').innerText = "Hệ sóng khuyết thiếu: " + numValue + ". Đây là các năng lượng bài học mà họ tên bạn chưa sở hữu, cần rèn luyện chủ động trong cuộc sống để bổ khuyết hoàn hảo.";
+    } else if (valueId === 'valLkDDSM') {
+      document.getElementById('modalDesc').innerText = "Chỉ số liên kết hành trình Đường Đời và Sứ Mệnh là số " + numValue + ". Bài học cốt lõi giúp bạn gắn kết năng lực và mục tiêu cuộc đời thống nhất.";
+    } else if (valueId === 'valLkLHNC') {
+      document.getElementById('modalDesc').innerText = "Trục kết nối nội tâm (Linh Hồn) và biểu hiện bên ngoài (Nhân Cách) là số " + numValue + ". Sóng cân bằng giúp bạn thống nhất giữa suy nghĩ bên trong và hành động bên ngoài.";
+    } else {
+      document.getElementById('modalDesc').innerText = getNumberMeaning(numValue);
+    }
+    
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function closePopup() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  function runCalculations() {
+    const fullName = document.getElementById('fullName').value.trim();
+    const d = document.getElementById('inDay').value;
+    const m = document.getElementById('inMonth').value;
+    const y = document.getElementById('inYear').value;
+    const btn = document.getElementById('btnTraCuu');
+    
+    if (!fullName || !d || !m || !y) {
+      alert('Vui lòng điền đầy đủ họ tên và ngày tháng năm sinh.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "ĐANG KHỞI TẠO SÓNG RUNG...";
+    document.getElementById('loadingText').style.display = 'block';
+    document.getElementById('resultsBlock').style.display = 'none';
+    
+    setTimeout(function() {
+      try {
+        const res = calculateNumerologyLocal(fullName, d + '-' + m + '-' + y);
+        
+        btn.disabled = false;
+        btn.innerText = "Khai Mở Năng Lượng Bản Đồ";
+        document.getElementById('loadingText').style.display = 'none';
+        document.getElementById('resultsBlock').style.display = 'block';
+        
+        // Cập nhật giá trị vào các ô
+        formatAndDisplayKarmic('valDuongDoi', res.duongDoi, res);
+        formatAndDisplayKarmic('valSuMenh', res.suMenh, res);
+        formatAndDisplayKarmic('valLkDDSM', res.lienKetDDSM, res);
+        formatAndDisplayKarmic('valTruongThanh', res.truongThanh, res);
+        formatAndDisplayKarmic('valLinhHon', res.linhHon, res);
+        formatAndDisplayKarmic('valNhanCach', res.nhanCach, res);
+        formatAndDisplayKarmic('valLkLHNC', res.lienKetLHNC, res);
+        formatAndDisplayKarmic('valCanBang', res.canBang, res);
+        formatAndDisplayKarmic('valTuDuyLyTri', res.tuDuyLyTri, res);
+        formatAndDisplayKarmic('valNgaySinh', res.ngaySinh, res);
+        
+        document.getElementById('valTiemThuc').innerText = res.sucManhTiemThuc;
+        document.getElementById('valDamMe').innerText = res.damMe;
+        document.getElementById('valThieu').innerText = res.thieu;
+        
+        document.getElementById('currentTimeInfo').innerText = 'Ngày tra cứu: ' + res.currentDateInfo;
+        document.getElementById('valNamCN').innerText = res.namCaNhan;
+        document.getElementById('valThangCN').innerText = res.thangCaNhan;
+        document.getElementById('valNgayCN').innerText = res.ngayCaNhan;
+        
+        document.getElementById('valC1').innerText = res.chang.c1;
+        document.getElementById('ageC1').innerText = '0-' + res.chang.t1 + 't';
+        document.getElementById('valC2').innerText = res.chang.c2;
+        document.getElementById('ageC2').innerText = (res.chang.t1 + 1) + '-' + res.chang.t2 + 't';
+        document.getElementById('valC3').innerText = res.chang.c3;
+        document.getElementById('ageC3').innerText = (res.chang.t2 + 1) + '-' + res.chang.t3 + 't';
+        document.getElementById('valC4').innerText = res.chang.c4;
+        document.getElementById('ageC4').innerText = (res.chang.t3 + 1) + 't+';
+        
+        document.getElementById('valTT1').innerText = res.thachThuc.tt1;
+        document.getElementById('valTT2').innerText = res.thachThuc.tt2;
+        document.getElementById('valTT3').innerText = res.thachThuc.tt3;
+        document.getElementById('valTT4').innerText = res.thachThuc.tt4;
+        
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerText = "Khai Mở Năng Lượng Bản Đồ";
+        document.getElementById('loadingText').style.display = 'none';
+        alert('Lỗi tính toán: ' + err.message);
+      }
+    }, 600);
+  }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <div class="zalo-popup-widget">
@@ -93,3 +938,5 @@ function xuatPDFThuVien() {
   });
 }
 </script>
+</body>
+</html>
